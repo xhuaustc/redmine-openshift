@@ -15,6 +15,40 @@ objects:
     database-password: ${MYSQL_PASSWORD}
     database-root-password: ${MYSQL_PASSWORD}
     database-user: ${MYSQL_USER}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: redmine-mysql-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${MYSQL_DATA_VOLUME_CAPACITY}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: redmine-file-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${REDMINE_FILE_VOLUME_CAPACITY}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: redmine-plugins-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${REDMINE_PLUGINS_VOLUME_CAPACITY}
+
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -100,8 +134,9 @@ objects:
         securityContext: {}
         terminationGracePeriodSeconds: 10
         volumes:
-        - emptyDir: {}
-          name: mysql-data
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: redmine-mysql-data
     test: false
     triggers:
     - imageChangeParams:
@@ -176,13 +211,19 @@ objects:
           volumeMounts:
           - mountPath: /usr/src/redmine/files
             name: redmine-1
+          - mountPath: /usr/src/redmine/plugins
+            name: redmine-2
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
         terminationGracePeriodSeconds: 10
         volumes:
-        - emptyDir: {}
-          name: redmine-1
+        - name: redmine-1
+          persistentVolumeClaim:
+            claimName: redmine-file-data
+        - name: redmine-2
+          persistentVolumeClaim:
+            claimName: redmine-plugins-data
     test: false
     triggers:
     - type: ConfigChange
@@ -251,3 +292,18 @@ parameters:
   value: redhat123
   name: MYSQL_PASSWORD
   required: true
+- description: Volume space available for MySQL Data 
+  displayName: Volume Capacity For Mysql
+  name: MYSQL_DATA_VOLUME_CAPACITY
+  required: true
+  value: 10Gi
+- description: Volume space available for Redmine File 
+  displayName: Volume Capacity For Redmine File
+  name: REDMINE_FILE_VOLUME_CAPACITY
+  required: true
+  value: 10Gi
+- description: Volume space available for Redmine Plugins
+  displayName: Volume Capacity For Redmine Plugins
+  name: REDMINE_PLUGINS_VOLUME_CAPACITY
+  required: true
+  value: 10Gi
