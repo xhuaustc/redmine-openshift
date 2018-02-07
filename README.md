@@ -15,3 +15,14 @@ So the steps to deploy this application are:
 4. From the webconsole, access to the project, press Add To Project and create the app using the previously created template.
 
 5. Please wait until the pods are ready, then you can log-in with the following Redmine credentials: admin/admin
+
+
+ALTER TABLE issues CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+ALTER TABLE journals CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+ALTER TABLE wiki_contents CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+
+以下这个已经在sh文件中更新
+In config/database.yml
+encoding: utf8
+to
+encoding: utf8mb4
