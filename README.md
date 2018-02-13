@@ -26,3 +26,7 @@ In config/database.yml
 encoding: utf8
 to
 encoding: utf8mb4
+
+---
+添加环境变量
+REDMINE_PLUGINS_MIGRATE = 1
